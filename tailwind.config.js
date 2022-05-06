@@ -15,14 +15,10 @@ module.exports = {
       },
     },
     colors: {
-      primary: {
-        light: "var(--primary-light)",
-        DEFAULT: "var(--primary)",
-        dark: "var(--primary-dark)",
-      },
+      primary: '#4338CA',
       contrast: "var(--contrast)",
       transparent: 'transparent',
-      black: '#101111',
+      black: '#4338CA',
       white: '#fff',
       gray: {
         // 100: "#f8f8f8",
@@ -61,6 +57,9 @@ module.exports = {
        DEFAULT: theme('colors.gray.200', 'currentColor'),
      }),
     extend: {
+      backgroundColor: {
+        body: '#1f007a',
+      },
       fontSize: {
         md: "0.938rem",
         ss: "0.813rem",
