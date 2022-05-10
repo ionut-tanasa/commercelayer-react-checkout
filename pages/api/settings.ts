@@ -100,7 +100,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const orderId = req.query.orderId as string
 
   const domain = DOMAIN || "commercelayer.io"
-  console.log('domain: ' + domain)
+  console.log("domain: " + domain)
 
   const paymentReturn = req.query.paymentReturn === "true"
 
@@ -120,7 +120,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const subdomain = req.headers.host?.split(":")[0].split(".")[0]
 
   const { slug, kind, isTest } = getTokenInfo(accessToken)
-  console.log('kind: ' + kind)
+  console.log("kind: " + kind)
 
   if (!slug) {
     return invalidateCheckout()

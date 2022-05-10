@@ -1,12 +1,13 @@
+import { ArrowLeftIcon } from "@heroicons/react/outline"
+import { useTranslation } from "react-i18next"
 import styled from "styled-components"
 import tw from "twin.macro"
+
+import { Button } from "../ui/Button"
 
 import { Base } from "components/ui/Base"
 import { Card } from "components/ui/Card"
 import { Container } from "components/ui/Container"
-import { Button } from "../ui/Button";
-import { useTranslation } from "react-i18next";
-import { ArrowLeftIcon } from "@heroicons/react/outline";
 
 interface Props {
   aside: React.ReactNode
@@ -16,7 +17,7 @@ interface Props {
 export const LayoutDefault: React.FC<Props> = ({ main, aside }) => {
   const { t } = useTranslation()
   const handleClick = () => {
-    document.location.href = 'http://localhost:3000'
+    document.location.href = "http://localhost:3000"
   }
   return (
     <Base>
@@ -27,7 +28,7 @@ export const LayoutDefault: React.FC<Props> = ({ main, aside }) => {
             onClick={handleClick}
             className="bg-indigo-700"
           >
-            <ArrowLeftIcon className="text-xs h-5 w-5 mr-5"/>
+            <ArrowLeftIcon className="w-5 h-5 mr-5 text-xs" />
             {t("general.back")}
           </Button>
 
