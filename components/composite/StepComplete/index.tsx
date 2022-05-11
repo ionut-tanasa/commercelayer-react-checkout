@@ -63,7 +63,7 @@ export const StepComplete: React.FC<Props> = ({
   if (!ctx) return null
 
   const handleClick = () => {
-    ctx?.returnUrl && (document.location.href = ctx?.returnUrl)
+    document.location.href = process.env.NEXT_PUBLIC_SHOP_URL as string
   }
 
   return (
@@ -99,18 +99,16 @@ export const StepComplete: React.FC<Props> = ({
               />
             </Message>
 
-            {ctx?.returnUrl && (
-              <WrapperButton>
-                <Button
-                  data-test-id="button-continue-to-shop"
-                  onClick={handleClick}
-                >
-                  {t("stepComplete.continue")}
-                </Button>
+            <WrapperButton>
+              <Button
+                data-test-id="button-continue-to-shop"
+                onClick={handleClick}
+              >
+                {t("stepComplete.continue")}
+              </Button>
 
-                {""}
-              </WrapperButton>
-            )}
+              {""}
+            </WrapperButton>
           </Main>
         </Wrapper>
       </Top>
