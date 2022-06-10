@@ -17,7 +17,7 @@ interface Props {
 export const LayoutDefault: React.FC<Props> = ({ main, aside }) => {
   const { t } = useTranslation()
   const handleClick = () => {
-    document.location.href = "http://localhost:3000"
+    document.location.href = process.env.NEXT_PUBLIC_SHOP_URL as string
   }
   return (
     <Base>
