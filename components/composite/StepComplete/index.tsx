@@ -23,7 +23,6 @@ import {
   AddressContainer,
   Bottom,
   Main,
-  Message,
   Recap,
   RecapBox,
   RecapCol,
@@ -63,7 +62,7 @@ export const StepComplete: React.FC<Props> = ({
   if (!ctx) return null
 
   const handleClick = () => {
-    document.location.href = process.env.NEXT_PUBLIC_SHOP_URL as string
+    ctx?.returnUrl && (document.location.href = ctx?.returnUrl)
   }
 
   return (
@@ -92,23 +91,23 @@ export const StepComplete: React.FC<Props> = ({
                 }}
               />
             </Text>
-            <Message>
-              <SupportMessage
-                supportEmail={supportEmail}
-                supportPhone={supportPhone}
-              />
-            </Message>
+            <SupportMessage
+              supportEmail={supportEmail}
+              supportPhone={supportPhone}
+            />
 
-            <WrapperButton>
-              <Button
-                data-test-id="button-continue-to-shop"
-                onClick={handleClick}
-              >
-                {t("stepComplete.continue")}
-              </Button>
+            {ctx?.returnUrl && (
+              <WrapperButton>
+                <Button
+                  data-test-id="button-continue-to-shop"
+                  onClick={handleClick}
+                >
+                  {t("stepComplete.continue")}
+                </Button>
 
-              {""}
-            </WrapperButton>
+                {""}
+              </WrapperButton>
+            )}
           </Main>
         </Wrapper>
       </Top>
@@ -182,7 +181,7 @@ export const StepComplete: React.FC<Props> = ({
                             {({ brand }) => {
                               if (ctx.isCreditCard) {
                                 return (
-                                  <Trans t={t} i18nKey="stepPayment.endingIn">
+                                  <Trans i18nKey="stepPayment.endingIn">
                                     {brand}
                                     <PaymentSourceDetail
                                       className="ml-1 font-normal"

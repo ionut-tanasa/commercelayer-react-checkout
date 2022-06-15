@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env.local") })
 // Reference: https://playwright.dev/docs/test-configuration
 const config: PlaywrightTestConfig = {
   // Timeout per test
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   // Test directory
   testDir: "specs/e2e",
   // If a test fails, retry it additional 2 times
@@ -46,12 +46,17 @@ const config: PlaywrightTestConfig = {
         // Configure the browser to use.
         browserName: "chromium",
         // Any Chromium-specific options.
-        viewport: { width: 1200, height: 800 },
+        viewport: { width: 1200, height: 900 },
         baseURL: process.env.NEXT_PUBLIC_BASE_URL,
-        // launchOptions: {
-        //   slowMo: 100,
-        //   devtools: true,
-        // },
+        launchOptions: {
+          // logger: {
+          //   isEnabled: (name, severity) => true,
+          //   log: (name, severity, message, args) =>
+          //     console.log(name, severity, message, args),
+          // },
+          // slowMo: 100,
+          // devtools: true,
+        },
       },
     },
     // {

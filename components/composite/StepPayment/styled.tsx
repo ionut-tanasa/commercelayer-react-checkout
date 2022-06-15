@@ -6,10 +6,10 @@ import { CheckCss } from "components/ui/form/CheckBox"
 import { RadioCss } from "components/ui/form/RadioButton"
 
 export const PaymentWrapper = styled.div`
-  ${tw`text-black border border-gray-300 mb-5 p-3 rounded bg-gray-50 relative transition duration-200 ease-in hover:border-primary`}
+  ${tw`text-black border border-gray-300 mb-5 p-3 rounded bg-gray-50 relative transition duration-200 ease-in hover:border-primary group-hover:(cursor-pointer) group-last:mb-0`}
 
-  .payment:last-of-type & {
-    ${tw`mb-0`}
+  label {
+    ${tw`group-hover:(cursor-pointer)`}
   }
 
   .payment.active & {
@@ -18,12 +18,6 @@ export const PaymentWrapper = styled.div`
     input[type="radio"] + label {
       ${tw`pointer-events-none cursor-default`}
     }
-  }
-
-  :not(.payment.active &)::after {
-    ${tw`absolute inset-0 z-0 pointer-events-auto cursor-pointer bg-transparent`}
-
-    content: "";
   }
 `
 export const PaymentSummary = styled.div`
@@ -55,6 +49,16 @@ export const PaymentSourceContainer = styled.div`
 
   .adyen-checkout__label__text {
     ${tw`transition-none text-gray-500`}
+  }
+  .frame--activated {
+    ${tw`h-12 mb-3`}
+    &.expiry-date-frame, 
+    &.cvv-frame {
+      ${tw`inline-block w-1/2 mb-0`}
+    }
+    &:last-of-type {
+      ${tw`pl-3`}
+    }
   }
 `
 export const PaymentDetailsWrapper = styled.div`

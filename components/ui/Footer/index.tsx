@@ -7,8 +7,7 @@ export const Footer: React.FC = () => {
   return (
     <Wrapper>
       <LogoWrapper>
-        <span className="mr-2">Powered by</span>
-        <Logo width="135" height="22" className="pl-2" />
+        Powered by <Logo width="135" height="22" className="pl-2" />
       </LogoWrapper>
     </Wrapper>
   )
