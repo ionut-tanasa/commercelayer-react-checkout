@@ -1,11 +1,13 @@
 import { Address } from "@commercelayer/sdk"
 import { useContext } from "react"
+import { useTranslation } from "react-i18next"
 import styled from "styled-components"
 import tw from "twin.macro"
 
 import { ShippingToggleProps } from "components/composite/StepCustomer"
 import { AddressInputGroup } from "components/composite/StepCustomer/AddressInputGroup"
 import { AppContext } from "components/data/AppProvider"
+import { InformationCircleIcon, ExclamationIcon } from "@heroicons/react/outline";
 
 interface Props {
   billingAddress?: Address
@@ -17,6 +19,7 @@ export const BillingAddressFormNew: React.FC<Props> = ({
   openShippingAddress,
 }: Props) => {
   const appCtx = useContext(AppContext)
+  const { t } = useTranslation()
 
   if (!appCtx) {
     return null
@@ -96,6 +99,14 @@ export const BillingAddressFormNew: React.FC<Props> = ({
           value={billingAddress?.billing_info || ""}
         />
       )}
+      <div className="flex flex-row text-xs items-center mt-1 pb-2">
+        <div className="flex">
+          <ExclamationIcon className="h-4 w-4 text-primary mr-2"/>
+        </div>
+        <span className="flex text-xs text-gray-500">
+          {t(`addressForm.billing_address_new_address_info`)}
+          </span>
+      </div>
     </Wrapper>
   )
 }

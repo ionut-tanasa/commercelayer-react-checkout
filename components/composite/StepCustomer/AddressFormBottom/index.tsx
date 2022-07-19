@@ -23,7 +23,10 @@ export const AddressFormBottom: React.FC<Props> = ({
 
   return (
     <Wrapper className={className}>
-      <AddressSectionSaveOnAddressBook addressType={addressType} />
+      {addressType === 'shipping' && (
+        <AddressSectionSaveOnAddressBook addressType={addressType} />
+      )}
+
       {hasCustomerAddresses && (
         <LinkButton
           data-test-id={`close-${addressType}-form`}

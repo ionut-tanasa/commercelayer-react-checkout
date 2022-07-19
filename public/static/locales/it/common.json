@@ -110,6 +110,8 @@
         "billing_address_zip_code": "CAP",
         "billing_address_phone": "Telefono",
         "billing_address_billing_info": "Informazioni di fatturazione",
+        "billing_address_billing_info_info": "P.IVA, Codice Fiscale, SDI",
+        "billing_address_new_address_info": "Le modifiche verranno applicate solo all'ordine corrente. Per modificare il tuo indirizzo di fatturazione in modo permanente ricordati di modificare l'indirizzo sul portale Cyrcool",
         "ship_to_different_address": "Spedisci ad un altro indirizzo",
         "shipping_address_title": "Indirizzo di spedizione",
         "shipping_address_first_name": "Nome",

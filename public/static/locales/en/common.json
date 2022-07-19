@@ -110,6 +110,8 @@
         "billing_address_zip_code": "Zip Code",
         "billing_address_phone": "Phone",
         "billing_address_billing_info": "Billing info",
+        "billing_address_billing_info_info": "Vat Code, Tax Code, SDI",
+        "billing_address_new_address_info": "The changes will only be applied to the current order. To change your billing address permanently remember to change the address on the Cyrcool portal.",
         "ship_to_different_address": "Ship to different address",
         "shipping_address_title": "Shipping Address",
         "shipping_address_first_name": "First name",

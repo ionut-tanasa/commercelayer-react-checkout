@@ -10,6 +10,7 @@ import {
   AddressStateSelectName,
   BaseInputType,
 } from "@commercelayer/react-components"
+import  {InformationCircleIcon} from "@heroicons/react/outline"
 import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import styled from "styled-components"
@@ -90,6 +91,8 @@ export const AddressInputGroup: React.FC<Props> = ({
     fieldName === "shipping_address_state_code" ||
     fieldName === "billing_address_state_code"
 
+  const isBillingInfo = fieldName === "billing_address_billing_info"
+
   useEffect(() => {
     setValueStatus(value || "")
   }, [value])
@@ -147,7 +150,27 @@ export const AddressInputGroup: React.FC<Props> = ({
           <Label htmlFor={fieldName}>{label}</Label>
         </>
       )
-    } else {
+    } else if (isBillingInfo) {
+      return (
+        <>
+          <StyledAddressInput
+            id={fieldName}
+            required={required}
+            data-test-id={`input_${fieldName}`}
+            name={fieldName as AddressInputName}
+            type={type}
+            value={valueStatus}
+            className="form-input"
+          />
+          <Label htmlFor={fieldName}>{label}</Label>
+          <div className="flex text-xs items-center mt-1 pb-2">
+            <InformationCircleIcon className="text-primary h-4 w-4 mr-2"/>
+            <span className="text-gray-500 text-xs">{t(`addressForm.billing_address_billing_info_info`)}</span>
+          </div>
+        </>
+      )
+    }
+    else {
       return (
         <>
           <StyledAddressInput
@@ -168,7 +191,7 @@ export const AddressInputGroup: React.FC<Props> = ({
   return (
     <div className="mb-8">
       <Wrapper>
-        <div className="relative h-10">{renderInput()}</div>
+        <div className={`relative ${isBillingInfo ? "h-16" : "h-10"}`}>{renderInput()}</div>
       </Wrapper>
       <StyledErrors
         data-test-id={`error_${fieldName}`}
