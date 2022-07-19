@@ -23,7 +23,7 @@ export const AddressFormBottom: React.FC<Props> = ({
 
   return (
     <Wrapper className={className}>
-      {addressType === 'shipping' && (
+      {addressType === "shipping" && (
         <AddressSectionSaveOnAddressBook addressType={addressType} />
       )}
 

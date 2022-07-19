@@ -10,7 +10,7 @@ import {
   AddressStateSelectName,
   BaseInputType,
 } from "@commercelayer/react-components"
-import  {InformationCircleIcon} from "@heroicons/react/outline"
+import { InformationCircleIcon } from "@heroicons/react/outline"
 import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import styled from "styled-components"
@@ -163,14 +163,15 @@ export const AddressInputGroup: React.FC<Props> = ({
             className="form-input"
           />
           <Label htmlFor={fieldName}>{label}</Label>
-          <div className="flex text-xs items-center mt-1 pb-2">
-            <InformationCircleIcon className="text-primary h-4 w-4 mr-2"/>
-            <span className="text-gray-500 text-xs">{t(`addressForm.billing_address_billing_info_info`)}</span>
+          <div className="flex items-center pb-2 mt-1 text-xs">
+            <InformationCircleIcon className="w-4 h-4 mr-2 text-primary" />
+            <span className="text-xs text-gray-500">
+              {t(`addressForm.billing_address_billing_info_info`)}
+            </span>
           </div>
         </>
       )
-    }
-    else {
+    } else {
       return (
         <>
           <StyledAddressInput
@@ -191,7 +192,9 @@ export const AddressInputGroup: React.FC<Props> = ({
   return (
     <div className="mb-8">
       <Wrapper>
-        <div className={`relative ${isBillingInfo ? "h-16" : "h-10"}`}>{renderInput()}</div>
+        <div className={`relative ${isBillingInfo ? "h-16" : "h-10"}`}>
+          {renderInput()}
+        </div>
       </Wrapper>
       <StyledErrors
         data-test-id={`error_${fieldName}`}
