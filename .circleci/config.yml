@@ -3,6 +3,13 @@ version: 2.1
 orbs:
   aws-s3: circleci/aws-s3@3.1.1
 
+setup: &setup
+  - run:
+      name: Setup
+      command: |
+        sudo npm install -g pnpm
+        pnpm install
+
 jobs:
   test: # this can be any name you choose
     docker:
@@ -26,14 +33,10 @@ jobs:
             apt-get install -y curl wget gpg
             curl -sL https://deb.nodesource.com/setup_18.x | bash -
             apt-get install -y nodejs
+      - <<: *setup
       - run:
-          name: Install pnpm package manager
+          name: Install Playwright
           command: |
-            curl -L https://pnpm.js.org/pnpm.js | node - add --global pnpm@7
-      - run:
-          name: Install Dependencies
-          command: |
-            pnpm install
             pnpm playwright install chromium
       - save_cache:
           name: Save pnpm Package Cache
@@ -50,7 +53,7 @@ jobs:
             pnpm run serve &
             TESTFILES=$(circleci tests glob "specs/e2e/**/*.spec.ts" | circleci tests split --split-by=timings)   
             pnpm playwright test --config=playwright.config.ci.ts ${TESTFILES}
-  
+
   build:
     docker:
       - image: cimg/node:18.12.1
@@ -70,7 +73,6 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           from: out
           to: "s3://$S3_ASSETS_BUCKET/team/fe-static-apps/$FOLDER/<<pipeline.git.tag>>"
-
 
 workflows:
   tests:
