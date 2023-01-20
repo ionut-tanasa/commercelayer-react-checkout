@@ -93,8 +93,8 @@ workflows:
       #       branches:
       #         ignore: /.*/
       - build:
-          requires:
-            - test
+          # requires:
+          #   - test
           context: commercelayer
           filters:
             tags:
