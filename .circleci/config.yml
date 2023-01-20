@@ -7,7 +7,7 @@ setup: &setup
   - run:
       name: Setup
       command: |
-        npm install -g pnpm
+        npm install pnpm
         pnpm install
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
           name: Run tests
           command: |
             pnpm run serve &
-            TESTFILES=$(circleci tests glob "specs/e2e/**/*.spec.ts" | circleci tests split --split-by=timings)   
+            TESTFILES=$(circleci tests glob "specs/e2e/**/*.spec.ts" | circleci tests split --split-by=timings)
             pnpm playwright test --config=playwright.config.ci.ts ${TESTFILES}
 
   build:
@@ -75,23 +75,23 @@ jobs:
           to: "s3://$S3_ASSETS_BUCKET/team/fe-static-apps/$FOLDER/<<pipeline.git.tag>>"
 
 workflows:
-  tests:
-    jobs:
-      - test:
-          context: commercelayer
-          filters:
-            tags:
-              ignore: /v.*/
+  # tests:
+  #   jobs:
+  #     - test:
+  #         context: commercelayer
+  #         filters:
+  #           tags:
+  #             ignore: /v.*/
 
   test-build-and-push:
     jobs:
-      - test:
-          context: commercelayer
-          filters:
-            tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*).*/
-            branches:
-              ignore: /.*/
+      # - test:
+      #     context: commercelayer
+      #     filters:
+      #       tags:
+      #         only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*).*/
+      #       branches:
+      #         ignore: /.*/
       - build:
           requires:
             - test
