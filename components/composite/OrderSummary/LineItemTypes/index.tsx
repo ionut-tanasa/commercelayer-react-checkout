@@ -1,3 +1,4 @@
+import { LineItemField } from "@commercelayer/react-components"
 import {
   LineItem,
   TLineItem,
@@ -49,6 +50,17 @@ export const LineItemTypes: React.FC<Props> = ({ type }) => {
           <StyledLineItemOptions showAll showName={true} className="options">
             <LineItemOption />
           </StyledLineItemOptions>
+          <LineItemField attribute="frequency">
+            {/*  @ts-expect-error typing on attribute */}
+            {({ attributeValue }) =>
+              attributeValue ? (
+                <p className="text-sm text-gray-400">
+                  {attributeValue[0].toUpperCase() + attributeValue.slice(1)}{" "}
+                  subscription
+                </p>
+              ) : null
+            }
+          </LineItemField>
           <LineItemQty>
             <LineItemQuantity>
               {(props) => (
