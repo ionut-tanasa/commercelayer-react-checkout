@@ -1,5 +1,4 @@
-import { PlaceOrderContainer } from "@commercelayer/react-components"
-import { useRouter } from "next/router"
+import type { Order } from "@commercelayer/sdk"
 import { useContext, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 
@@ -24,8 +23,8 @@ import {
 
 interface Props {
   isActive: boolean
-  termsUrl?: string
-  privacyUrl?: string
+  termsUrl: NullableType<string>
+  privacyUrl: NullableType<string>
 }
 
 const StepPlaceOrder: React.FC<Props> = ({
@@ -34,7 +33,6 @@ const StepPlaceOrder: React.FC<Props> = ({
   privacyUrl,
 }) => {
   const { t } = useTranslation()
-  const { query } = useRouter()
 
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
 
@@ -44,23 +42,19 @@ const StepPlaceOrder: React.FC<Props> = ({
   if (!appCtx) {
     return null
   }
-  let paypalPayerId = ""
-  let checkoutComSession = ""
-
-  if (query.PayerID) {
-    paypalPayerId = query.PayerID as string
-  }
-
-  if (query["cko-session-id"]) {
-    checkoutComSession = query["cko-session-id"] as string
-  }
 
   const { placeOrder } = appCtx
 
-  const handlePlaceOrder = async ({ placed }: { placed: boolean }) => {
+  const handlePlaceOrder = async ({
+    placed,
+    order,
+  }: {
+    placed: boolean
+    order?: Order
+  }) => {
     if (placed) {
       setIsPlacingOrder(true)
-      await placeOrder()
+      await placeOrder(order)
       if (gtmCtx?.firePurchase && gtmCtx?.fireAddPaymentInfo) {
         await gtmCtx.fireAddPaymentInfo()
         await gtmCtx.firePurchase()
@@ -71,7 +65,7 @@ const StepPlaceOrder: React.FC<Props> = ({
 
   return (
     <>
-      <ErrorsContainer data-test-id="errors-container">
+      <ErrorsContainer data-testid="errors-container">
         <StyledErrors
           resource="orders"
           messages={
@@ -86,67 +80,65 @@ const StepPlaceOrder: React.FC<Props> = ({
               return null
             }
             const compactedErrors = props.errors
-            return compactedErrors?.map((error, index) => {
-              if (error?.trim().length === 0 || !error) {
-                return null
-              }
-              return (
-                <ErrorWrapper key={index}>
-                  <ErrorIco>
-                    <ErrorIcon />
-                  </ErrorIco>
-                  <ErrorMessage>{error}</ErrorMessage>
-                </ErrorWrapper>
-              )
-            })
+            return (
+              <>
+                {compactedErrors?.map((error, index) => {
+                  if (error?.trim().length === 0 || !error) {
+                    return null
+                  }
+                  return (
+                    <ErrorWrapper key={index}>
+                      <ErrorIco>
+                        <ErrorIcon />
+                      </ErrorIco>
+                      <ErrorMessage>{error}</ErrorMessage>
+                    </ErrorWrapper>
+                  )
+                })}
+              </>
+            )
           }}
         </StyledErrors>
       </ErrorsContainer>
-      <PlaceOrderContainer
-        options={{
-          paypalPayerId,
-          checkoutCom: { session_id: checkoutComSession },
-        }}
-      >
-        <>
-          {!!termsUrl && !!privacyUrl && (
-            <FlexContainer className="items-start mx-5 mt-4 mb-2.5 md:mb-5 md:pb-5 md:mx-0 md:mt-0 md:border-b lg:pl-8">
-              <StyledPrivacyAndTermsCheckbox
-                id="privacy-terms"
-                className="relative form-checkbox top-0.5"
-                data-test-id="checkbox-privacy-and-terms"
-              />
-              <Label htmlFor="privacy-terms">
-                <Trans
-                  i18nKey="general.privacy_and_terms"
-                  components={{
-                    bold: <strong />,
-                    termsUrl: (
-                      <a href={termsUrl} target="_blank" rel="noreferrer" />
-                    ),
-                    privacyUrl: (
-                      <a href={privacyUrl} target="_blank" rel="noreferrer" />
-                    ),
-                  }}
-                />
-              </Label>
-            </FlexContainer>
-          )}
-          <PlaceOrderButtonWrapper>
-            <StyledPlaceOrderButton
-              data-test-id="save-payment-button"
-              isActive={isActive}
-              onClick={handlePlaceOrder}
-              label={
-                <>
-                  {isPlacingOrder && <SpinnerIcon />}
-                  {t("stepPayment.submit")}
-                </>
-              }
+
+      <>
+        {!!termsUrl && !!privacyUrl && (
+          <FlexContainer className="items-start mx-5 mt-4 mb-2.5 md:mb-5 md:pb-5 md:mx-0 md:mt-0 md:border-b lg:pl-8">
+            <StyledPrivacyAndTermsCheckbox
+              id="privacy-terms"
+              className="relative form-checkbox top-0.5"
+              data-testid="checkbox-privacy-and-terms"
             />
-          </PlaceOrderButtonWrapper>
-        </>
-      </PlaceOrderContainer>
+            <Label htmlFor="privacy-terms">
+              <Trans
+                i18nKey="general.privacy_and_terms"
+                components={{
+                  bold: <strong />,
+                  termsUrl: (
+                    <a href={termsUrl} target="_blank" rel="noreferrer" />
+                  ),
+                  privacyUrl: (
+                    <a href={privacyUrl} target="_blank" rel="noreferrer" />
+                  ),
+                }}
+              />
+            </Label>
+          </FlexContainer>
+        )}
+        <PlaceOrderButtonWrapper>
+          <StyledPlaceOrderButton
+            data-testid="save-payment-button"
+            isActive={isActive}
+            onClick={handlePlaceOrder}
+            label={
+              <>
+                {isPlacingOrder && <SpinnerIcon />}
+                {t("stepPayment.submit")}
+              </>
+            }
+          />
+        </PlaceOrderButtonWrapper>
+      </>
     </>
   )
 }

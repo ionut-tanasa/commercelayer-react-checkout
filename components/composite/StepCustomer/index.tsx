@@ -1,6 +1,6 @@
-// import { Address, AddressField } from "@commercelayer/react-components"
+import type { Order } from "@commercelayer/sdk"
 import classNames from "classnames"
-import { Fragment, useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { AccordionContext } from "components/data/AccordionProvider"
@@ -29,7 +29,12 @@ export const StepHeaderCustomer: React.FC<Props> = ({ step }) => {
     return null
   }
 
-  const { hasShippingAddress, hasBillingAddress, emailAddress } = appCtx
+  const {
+    hasShippingAddress,
+    hasBillingAddress,
+    emailAddress,
+    isShipmentRequired,
+  } = appCtx
 
   const { t } = useTranslation()
 
@@ -38,10 +43,22 @@ export const StepHeaderCustomer: React.FC<Props> = ({ step }) => {
       (!hasShippingAddress && !hasBillingAddress) ||
       accordionCtx.status === "edit"
     ) {
-      return <p>{t("stepCustomer.notSet")}</p>
+      return (
+        <>
+          <p data-testid="customer-addresses-title">
+            {isShipmentRequired
+              ? t("stepCustomer.notSet")
+              : t("stepCustomer.notSetNoDelivery")}
+          </p>
+        </>
+      )
     }
 
-    return <p data-test-id="customer-email-step-header">{emailAddress}</p>
+    return (
+      <>
+        <p data-testid="customer-email-step-header">{emailAddress}</p>
+      </>
+    )
   }
 
   return (
@@ -100,15 +117,17 @@ export const StepCustomer: React.FC<Props> = () => {
     forceShipping,
     disableToggle,
   }: ShippingToggleProps) => {
-    if (forceShipping) {
-      setShipToDifferentAddress(true)
+    if (isShipmentRequired) {
+      if (forceShipping) {
+        setShipToDifferentAddress(true)
+      }
+      setDisabledShipToDifferentAddress(disableToggle)
     }
-    setDisabledShipToDifferentAddress(disableToggle)
   }
 
-  const handleSave = async () => {
+  const handleSave = async (params: { success: boolean; order?: Order }) => {
     setIsLocalLoader(true)
-    await setAddresses()
+    await setAddresses(params.order)
 
     // it is used temporarily to scroll
     // to the next step and fix
@@ -116,7 +135,7 @@ export const StepCustomer: React.FC<Props> = () => {
     const tab = document.querySelector('div[tabindex="2"]')
     const top = tab?.scrollLeft as number
     const left = tab?.scrollTop as number
-    window.scrollTo({ left, top: top, behavior: "smooth" })
+    window.scrollTo({ left, top, behavior: "smooth" })
 
     setIsLocalLoader(false)
   }
@@ -130,44 +149,50 @@ export const StepCustomer: React.FC<Props> = () => {
       })}
     >
       <StepContent>
-        {accordionCtx.isActive && (
-          <Fragment>
-            {isGuest ? (
-              <CheckoutAddresses
-                shippingAddress={shippingAddress}
-                billingAddress={billingAddress}
-                emailAddress={emailAddress}
-                hasSameAddresses={hasSameAddresses}
-                setCustomerEmail={setCustomerEmail}
-                isShipmentRequired={isShipmentRequired}
-                isLocalLoader={isLocalLoader}
-                openShippingAddress={openShippingAddress}
-                shipToDifferentAddress={shipToDifferentAddress}
-                setShipToDifferentAddress={setShipToDifferentAddress}
-                disabledShipToDifferentAddress={disabledShipToDifferentAddress}
-                handleSave={handleSave}
-              />
-            ) : (
-              <CheckoutCustomerAddresses
-                shippingAddress={shippingAddress}
-                billingAddress={billingAddress}
-                emailAddress={emailAddress}
-                hasCustomerAddresses={hasCustomerAddresses}
-                isShipmentRequired={isShipmentRequired}
-                isUsingNewShippingAddress={isUsingNewShippingAddress}
-                isUsingNewBillingAddress={isUsingNewBillingAddress}
-                hasSameAddresses={hasSameAddresses}
-                isLocalLoader={isLocalLoader}
-                shippingCountryCodeLock={shippingCountryCodeLock}
-                openShippingAddress={openShippingAddress}
-                shipToDifferentAddress={shipToDifferentAddress}
-                setShipToDifferentAddress={setShipToDifferentAddress}
-                disabledShipToDifferentAddress={disabledShipToDifferentAddress}
-                handleSave={handleSave}
-              />
-            )}
-          </Fragment>
-        )}
+        <>
+          {accordionCtx.isActive && (
+            <>
+              {isGuest ? (
+                <CheckoutAddresses
+                  shippingAddress={shippingAddress}
+                  billingAddress={billingAddress}
+                  emailAddress={emailAddress}
+                  hasSameAddresses={hasSameAddresses}
+                  setCustomerEmail={setCustomerEmail}
+                  isShipmentRequired={isShipmentRequired}
+                  isLocalLoader={isLocalLoader}
+                  openShippingAddress={openShippingAddress}
+                  shipToDifferentAddress={shipToDifferentAddress}
+                  setShipToDifferentAddress={setShipToDifferentAddress}
+                  disabledShipToDifferentAddress={
+                    disabledShipToDifferentAddress
+                  }
+                  handleSave={handleSave}
+                />
+              ) : (
+                <CheckoutCustomerAddresses
+                  shippingAddress={shippingAddress}
+                  billingAddress={billingAddress}
+                  emailAddress={emailAddress}
+                  hasCustomerAddresses={hasCustomerAddresses}
+                  isShipmentRequired={isShipmentRequired}
+                  isUsingNewShippingAddress={isUsingNewShippingAddress}
+                  isUsingNewBillingAddress={isUsingNewBillingAddress}
+                  hasSameAddresses={hasSameAddresses}
+                  isLocalLoader={isLocalLoader}
+                  shippingCountryCodeLock={shippingCountryCodeLock}
+                  openShippingAddress={openShippingAddress}
+                  shipToDifferentAddress={shipToDifferentAddress}
+                  setShipToDifferentAddress={setShipToDifferentAddress}
+                  disabledShipToDifferentAddress={
+                    disabledShipToDifferentAddress
+                  }
+                  handleSave={handleSave}
+                />
+              )}
+            </>
+          )}
+        </>
       </StepContent>
     </StepContainer>
   )
@@ -175,7 +200,7 @@ export const StepCustomer: React.FC<Props> = () => {
 
 interface EvaluateConditionsProps {
   countryCode?: string
-  shippingCountryCodeLock?: string
+  shippingCountryCodeLock: NullableType<string>
 }
 
 export function evaluateShippingToggle({

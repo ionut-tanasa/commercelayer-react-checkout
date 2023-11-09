@@ -52,10 +52,10 @@ module.exports = {
     fontFamily: {
       sans: ["Manrope", "ui-sans-serif", "sans-serif"],
     },
-    borderColor: theme => ({
-      ...theme('colors'),
-       DEFAULT: theme('colors.gray.200', 'currentColor'),
-     }),
+    borderColor: (theme) => ({
+      ...theme("colors"),
+      DEFAULT: theme("colors.gray.200", "currentColor"),
+    }),
     extend: {
       backgroundColor: {
         body: '#1f007a',
@@ -87,8 +87,8 @@ module.exports = {
         top: "0px -4px 1px 0px rgb(0, 0, 0, 0.025)",
       },
       transitionProperty: {
-        'bg': 'background',
-      }
+        bg: "background",
+      },
     },
   },
   variants: {
@@ -101,6 +101,5 @@ module.exports = {
     require("@tailwindcss/forms")({
       strategy: "class",
     }),
-    require("@tailwindcss/line-clamp"),
   ],
 }

@@ -13,7 +13,7 @@ import { AddressInputGroup } from "components/composite/StepCustomer/AddressInpu
 import { AppContext } from "components/data/AppProvider"
 
 interface Props {
-  billingAddress?: Address
+  billingAddress: NullableType<Address>
   openShippingAddress: (props: ShippingToggleProps) => void
 }
 

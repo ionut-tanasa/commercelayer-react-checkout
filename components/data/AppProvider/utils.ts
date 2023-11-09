@@ -1,4 +1,3 @@
-import { TypeAccepted } from "@commercelayer/react-components/lib/utils/getLineItemsCount"
 import {
   Order,
   Address,
@@ -17,11 +16,24 @@ import {
 } from "@commercelayer/sdk"
 
 import { AppStateData } from "components/data/AppProvider"
-import { LINE_ITEMS_SHIPPABLE } from "components/utils/constants"
+
+export type LineItemType =
+  | "gift_cards"
+  | "payment_methods"
+  | "promotions"
+  | "shipments"
+  | "skus"
+  | "bundles"
+  | "adjustments"
+
+export type TypeAccepted = Extract<
+  LineItemType,
+  "skus" | "gift_cards" | "bundles" | "adjustments"
+>
 
 interface IsNewAddressProps {
-  address?: Address
-  customerAddresses?: Array<CustomerAddress>
+  address: NullableType<Address>
+  customerAddresses?: NullableType<CustomerAddress[]>
   isGuest: boolean
 }
 
@@ -54,25 +66,25 @@ export interface FetchOrderByIdResponse {
   hasSameAddresses: boolean
   hasEmailAddress: boolean
   customerAddresses: CustomerAddress[]
-  emailAddress?: string
+  emailAddress: NullableType<string>
   hasShippingAddress: boolean
-  shippingAddress?: Address
+  shippingAddress: NullableType<Address>
   hasBillingAddress: boolean
-  billingAddress?: Address
-  requiresBillingInfo?: boolean
+  billingAddress: NullableType<Address>
+  requiresBillingInfo: NullableType<boolean>
   hasShippingMethod: boolean
-  paymentMethod?: PaymentMethod
+  paymentMethod: NullableType<PaymentMethod>
   shipments: Array<ShipmentSelected>
   hasPaymentMethod: boolean
   hasCustomerAddresses: boolean
-  shippingCountryCodeLock?: string
+  shippingCountryCodeLock: NullableType<string>
   isShipmentRequired: boolean
   isPaymentRequired: boolean
   isComplete: boolean
-  returnUrl?: string
-  cartUrl?: string
+  returnUrl: NullableType<string>
+  cartUrl: NullableType<string>
   isCreditCard: boolean
-  taxIncluded?: boolean
+  taxIncluded: NullableType<boolean>
   shippingMethodName?: string
 }
 
@@ -88,7 +100,7 @@ function isNewAddress({
   const hasAddressIntoAddresses = Boolean(
     customerAddresses?.find(
       (customerAddress) =>
-        customerAddress.address?.reference === address?.reference
+        customerAddress?.address?.reference === address?.reference
     )
   )
 
@@ -191,8 +203,8 @@ export async function checkAndSetDefaultAddressForOrder({
 }
 
 interface IsBillingAddressSameAsShippingAddressProps {
-  billingAddress?: Address
-  shippingAddress?: Address
+  billingAddress: NullableType<Address>
+  shippingAddress: NullableType<Address>
 }
 
 function isBillingAddressSameAsShippingAddress({
@@ -222,11 +234,18 @@ function isBillingAddressSameAsShippingAddress({
   return true
 }
 
-export const fetchOrder = async (cl: CommerceLayerClient, orderId: string) => {
+export const fetchOrder = (cl: CommerceLayerClient, orderId: string) => {
   return cl.orders.retrieve(orderId, {
     fields: {
       orders: [
         "id",
+        // Start fields for GTM
+        "number",
+        "coupon_code",
+        "currency_code",
+        "shipping_amount_float",
+        "total_tax_amount_float",
+        // End fields for GTM
         "guest",
         "shipping_country_code_lock",
         "customer_email",
@@ -263,41 +282,16 @@ export const fetchOrder = async (cl: CommerceLayerClient, orderId: string) => {
   })
 }
 
-export async function checkIfShipmentRequired(
-  cl: CommerceLayerClient,
-  orderId: string
-): Promise<boolean> {
-  const lineItems = (
-    await cl.orders.retrieve(orderId, {
-      fields: {
-        line_items: ["item_type", "item"],
-      },
-      include: ["line_items", "line_items.item"],
-    })
-  ).line_items?.filter(
-    (line_item) =>
-      LINE_ITEMS_SHIPPABLE.includes(line_item.item_type as TypeAccepted) &&
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      !line_item.item?.do_not_ship
-  )
-
-  if (lineItems?.length === undefined) {
-    return false
-  }
-  // riguardare
-  return lineItems.length > 0
-}
-
 export function isPaymentRequired(order: Order) {
   return !(order.total_amount_with_taxes_float === 0)
 }
 
 export function calculateAddresses(
   order: Order,
-  addresses?: CustomerAddress[]
+  addresses: NullableType<CustomerAddress[]>
 ): Partial<AppStateData> {
-  const cAddresses = addresses || order.customer?.customer_addresses
+  const cAddresses =
+    (addresses || order.customer?.customer_addresses) ?? undefined
   const values = {
     hasCustomerAddresses: (cAddresses && cAddresses.length >= 1) || false,
     billingAddress: order.billing_address,
@@ -326,17 +320,18 @@ export function calculateAddresses(
 export function calculateSettings(
   order: Order,
   isShipmentRequired: boolean,
+  isGuest: boolean,
   customerAddress?: CustomerAddress[]
 ) {
   // FIX saving customerAddresses because we don't receive
-  // them from fetchORder
+  // them from fetchOrder
   const calculatedAddresses = calculateAddresses(
     order,
     order.customer?.customer_addresses || customerAddress
   )
 
   return {
-    isGuest: Boolean(order.guest),
+    isGuest,
     shippingCountryCodeLock: order.shipping_country_code_lock,
     hasEmailAddress: Boolean(order.customer_email),
     emailAddress: order.customer_email,
@@ -358,7 +353,8 @@ export function calculateSettings(
 export function checkPaymentMethod(order: Order) {
   const paymentMethod = order.payment_method
 
-  const paymentSource: PaymentSourceType | undefined = order.payment_source
+  const paymentSource: PaymentSourceType | undefined =
+    order.payment_source as PaymentSourceType
 
   let hasPaymentMethod = Boolean(
     paymentSource?.metadata?.card ||
@@ -383,7 +379,7 @@ export function checkPaymentMethod(order: Order) {
   }
 }
 
-export function creditCardPayment(paymentMethod?: PaymentMethod) {
+export function creditCardPayment(paymentMethod: NullableType<PaymentMethod>) {
   return (
     paymentMethod?.payment_source_type === "adyen_payments" ||
     paymentMethod?.payment_source_type === "stripe_payments" ||
@@ -395,6 +391,7 @@ export function calculateSelectedShipments(
   shipments: ShipmentSelected[],
   payload?: {
     shipmentId: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     shippingMethod: ShippingMethod | Record<string, any>
   }
 ) {
@@ -411,7 +408,9 @@ export function calculateSelectedShipments(
   return { shipments: shipmentsSelected, ...hasShippingMethod }
 }
 
-export function prepareShipments(shipments?: Shipment[]): ShipmentSelected[] {
+export function prepareShipments(
+  shipments?: NullableType<Shipment[]>
+): ShipmentSelected[] {
   return (shipments || []).map((a) => {
     return {
       shipmentId: a.id,

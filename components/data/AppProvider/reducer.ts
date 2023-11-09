@@ -51,6 +51,7 @@ export type Action =
         others: Partial<AppStateData>
         shipment: {
           shipmentId: string
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           shippingMethod: ShippingMethod | Record<string, any>
         }
       }
@@ -65,7 +66,7 @@ export type Action =
   | {
       type: ActionType.SET_PAYMENT
       payload: {
-        payment?: PaymentMethod
+        payment: NullableType<PaymentMethod>
         order: Order
         others: Partial<AppStateData>
       }

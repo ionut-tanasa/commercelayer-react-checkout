@@ -1,5 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { TypeAccepted } from "@commercelayer/react-components/lib/utils/getLineItemsCount"
 import CommerceLayer, {
   CommerceLayerStatic,
   CommerceLayerClient,
@@ -8,16 +6,21 @@ import CommerceLayer, {
 } from "@commercelayer/sdk"
 import retry from "async-retry"
 import jwt_decode from "jwt-decode"
-import type { NextApiRequest, NextApiResponse } from "next"
 
-import { LINE_ITEMS_SHOPPABLE } from "components/utils/constants"
-import hex2hsl, { BLACK_COLOR } from "components/utils/hex2hsl"
+import { TypeAccepted } from "components/data/AppProvider/utils"
+import {
+  LINE_ITEMS_SHIPPABLE,
+  LINE_ITEMS_SHOPPABLE,
+} from "components/utils/constants"
 
 const RETRIES = 2
 
 interface JWTProps {
   organization: {
     slug: string
+    id: string
+  }
+  owner?: {
     id: string
   }
   application: {
@@ -31,17 +34,17 @@ interface FetchResource<T> {
   success: boolean
 }
 
-function isProduction(env: string): boolean {
-  return env === "production"
+function isProduction(): boolean {
+  return process.env.NODE_ENV === "production"
 }
 
 async function retryCall<T>(
-  f: Promise<T>
+  f: () => Promise<T>
 ): Promise<FetchResource<T> | undefined> {
   return await retry(
     async (bail, number) => {
       try {
-        const object = await f
+        const object = await f()
         return {
           object: object as unknown as T,
           success: true,
@@ -70,7 +73,7 @@ async function retryCall<T>(
 async function getOrganization(
   cl: CommerceLayerClient
 ): Promise<FetchResource<Organization> | undefined> {
-  return retryCall<Organization>(
+  return retryCall<Organization>(() =>
     cl.organization.retrieve({
       fields: {
         organizations: [
@@ -93,7 +96,7 @@ async function getOrder(
   cl: CommerceLayerClient,
   orderId: string
 ): Promise<FetchResource<Order> | undefined> {
-  return retryCall<Order>(
+  return retryCall<Order>(() =>
     cl.orders.retrieve(orderId, {
       fields: {
         orders: [
@@ -107,9 +110,9 @@ async function getOrder(
           "privacy_url",
           "line_items",
         ],
-        line_items: ["item_type"],
+        line_items: ["item_type", "item"],
       },
-      include: ["line_items"],
+      include: ["line_items", "line_items.item"],
     })
   )
 }
@@ -119,51 +122,52 @@ function getTokenInfo(accessToken: string) {
     const {
       organization: { slug },
       application: { kind },
+      owner,
       test,
     } = jwt_decode(accessToken) as JWTProps
 
-    return { slug, kind, isTest: test }
+    return { slug, kind, isTest: test, isGuest: !owner }
   } catch (e) {
     console.log(`error decoding access token: ${e}`)
     return {}
   }
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const { NODE_ENV, DOMAIN, HOSTED } = process.env
-  const accessToken = req.query.accessToken as string
-  const orderId = req.query.orderId as string
+export const getSettings = async ({
+  accessToken,
+  orderId,
+  subdomain,
+  paymentReturn,
+}: {
+  accessToken: string
+  orderId: string
+  paymentReturn?: boolean
+  subdomain: string
+}) => {
+  const domain = process.env.NEXT_PUBLIC_DOMAIN || "commercelayer.io"
 
-  const domain = DOMAIN || "commercelayer.io"
-
-  const paymentReturn = req.query.paymentReturn === "true"
-
-  function invalidateCheckout(retry?: boolean) {
-    res.statusCode = 200
+  function invalidateCheckout(retry?: boolean): InvalidCheckoutSettings {
     console.log("access token:")
     console.log(accessToken)
     console.log("orderId")
     console.log(orderId)
-    return res.json({ validCheckout: false, retryOnError: !!retry })
+    return {
+      validCheckout: false,
+      retryOnError: !!retry,
+    } as InvalidCheckoutSettings
   }
 
   if (!accessToken || !orderId) {
     return invalidateCheckout()
   }
 
-  const subdomain = req.headers.host?.split(":")[0].split(".")[0]
-
-  const { slug, kind, isTest } = getTokenInfo(accessToken)
+  const { slug, kind, isTest, isGuest } = getTokenInfo(accessToken)
 
   if (!slug) {
     return invalidateCheckout()
   }
 
-  if (
-    isProduction(NODE_ENV) &&
-    !!HOSTED &&
-    (subdomain !== slug || kind !== "sales_channel")
-  ) {
+  if (isProduction() && (subdomain !== slug || kind !== "sales_channel")) {
     return invalidateCheckout()
   } else if (kind !== "sales_channel") {
     return invalidateCheckout()
@@ -171,11 +175,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const cl = CommerceLayer({
     organization: slug,
-    accessToken: accessToken,
+    accessToken,
     domain,
   })
 
-  const organizationResource = await getOrganization(cl)
+  const [organizationResource, orderResource] = await Promise.all([
+    getOrganization(cl),
+    getOrder(cl, orderId),
+  ])
 
   const organization = organizationResource?.object
 
@@ -184,7 +191,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return invalidateCheckout(true)
   }
 
-  const orderResource = await getOrder(cl, orderId)
   const order = orderResource?.object
 
   if (!orderResource?.success || !order?.id) {
@@ -202,17 +208,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return invalidateCheckout()
   }
 
+  const isShipmentRequired = (order.line_items || []).some(
+    (line_item) =>
+      LINE_ITEMS_SHIPPABLE.includes(line_item.item_type as TypeAccepted) &&
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      !line_item.item?.do_not_ship
+  )
+
   if (order.status === "draft" || order.status === "pending") {
-    // If returning from payment (PayPal) skip order refresh and payment_method reset
-    console.log(
-      !paymentReturn ? "refresh order" : "return from external payment"
-    )
-    if (!paymentReturn) {
-      const _refresh = !paymentReturn
+    // Logic to refresh the order is documented here: https://github.com/commercelayer/mfe-checkout/issues/356
+    if (!paymentReturn && (!order.autorefresh || (!isGuest && order.guest))) {
       try {
         await cl.orders.update({
           id: order.id,
-          _refresh,
+          _refresh: true,
           payment_method: cl.payment_methods.relationship(null),
           ...(!order.autorefresh && { autorefresh: true }),
         })
@@ -227,16 +237,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const appSettings: CheckoutSettings = {
     accessToken,
     endpoint: `https://${slug}.${domain}`,
+    isGuest: !!isGuest,
     domain,
     slug,
     orderNumber: order.number || 0,
     orderId: order.id,
+    isShipmentRequired,
     validCheckout: true,
     logoUrl: organization.logo_url || "/logo-inverted.png",
     companyName: organization.name || "Cyrcool",
     language: order.language_code || "en",
-    primaryColor: hex2hsl(organization.primary_color as string) || BLACK_COLOR,
-    favicon: organization.favicon_url || "/favicon.ico",
+    primaryColor: organization.primary_color || "#000000",
+    favicon:
+      organization.favicon_url ||
+      "https://data.commercelayer.app/assets/images/favicons/favicon-32x32.png",
     gtmId: isTest ? organization.gtm_id_test : organization.gtm_id,
     supportEmail: organization.support_email,
     supportPhone: organization.support_phone,
@@ -244,8 +258,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     privacyUrl: order.privacy_url,
   }
 
-  return res
-    .setHeader("Cache-Control", "s-maxage=1, stale-while-revalidate")
-    .status(200)
-    .json(appSettings)
+  return appSettings
 }

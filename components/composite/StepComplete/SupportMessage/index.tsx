@@ -3,8 +3,8 @@ import { Trans } from "react-i18next"
 import { Message } from "./styled"
 
 interface Props {
-  supportPhone?: string
-  supportEmail?: string
+  supportPhone: NullableType<string>
+  supportEmail: NullableType<string>
 }
 
 export const SupportMessage: React.FC<Props> = ({
@@ -38,13 +38,13 @@ export const SupportMessage: React.FC<Props> = ({
           ),
           WrapperEmail: (
             <a
-              data-test-id="support-email-link"
+              data-testid="support-email-link"
               href={`mailto:${supportEmail}`}
             />
           ),
           WrapperPhone: (
             <a
-              data-test-id="support-phone-link"
+              data-testid="support-phone-link"
               href={`tel:${supportPhone && supportPhone.replace(/\s+/g, "")}`}
             />
           ),

@@ -1,9 +1,7 @@
-import {
-  PaymentSource,
-  PaymentSourceBrandIcon,
-  PaymentSourceBrandName,
-  PaymentSourceDetail,
-} from "@commercelayer/react-components"
+import PaymentSource from "@commercelayer/react-components/payment_source/PaymentSource"
+import PaymentSourceBrandIcon from "@commercelayer/react-components/payment_source/PaymentSourceBrandIcon"
+import PaymentSourceBrandName from "@commercelayer/react-components/payment_source/PaymentSourceBrandName"
+import PaymentSourceDetail from "@commercelayer/react-components/payment_source/PaymentSourceDetail"
 import { useContext } from "react"
 import { useTranslation, Trans } from "react-i18next"
 
@@ -41,10 +39,10 @@ import {
 import { SupportMessage } from "./SupportMessage"
 
 interface Props {
-  logoUrl?: string
+  logoUrl: NullableType<string>
   companyName: string
-  supportEmail?: string
-  supportPhone?: string
+  supportEmail: NullableType<string>
+  supportPhone: NullableType<string>
   orderNumber: number
 }
 
@@ -80,12 +78,12 @@ export const StepComplete: React.FC<Props> = ({
             </div>
             <Title>{t("stepComplete.title")}</Title>
             <Text
-              data-test-id="complete-checkout-summary"
+              data-testid="complete-checkout-summary"
               className="text-gray-400"
             >
               <Trans
                 i18nKey={"stepComplete.description"}
-                values={{ orderNumber: orderNumber }}
+                values={{ orderNumber }}
                 components={{
                   WrapperOrderId: <strong className="text-black" />,
                 }}
@@ -98,12 +96,11 @@ export const StepComplete: React.FC<Props> = ({
 
             <WrapperButton>
               <Button
-                data-test-id="button-continue-to-shop"
+                data-testid="button-continue-to-shop"
                 onClick={handleClick}
               >
                 {t("stepComplete.continue")}
               </Button>
-
               {""}
             </WrapperButton>
           </Main>
@@ -124,50 +121,54 @@ export const StepComplete: React.FC<Props> = ({
               </RecapCol>
               <RecapCol>
                 <AddressContainer className="lg:!grid-cols-1 xl:!grid-cols-2">
-                  <div data-test-id="billing-address-recap">
+                  <div data-testid="billing-address-recap">
                     <RecapItemTitle>
                       {t("stepComplete.billed_to")}
                     </RecapItemTitle>
                     <RecapBox>
                       <CustomAddress
-                        firstName={ctx.billingAddress?.first_name}
-                        lastName={ctx.billingAddress?.last_name}
-                        city={ctx.billingAddress?.city}
-                        line1={ctx.billingAddress?.line_1}
-                        line2={ctx.billingAddress?.line_2}
-                        zipCode={ctx.billingAddress?.zip_code}
-                        stateCode={ctx.billingAddress?.state_code}
-                        countryCode={ctx.billingAddress?.country_code}
-                        phone={ctx.billingAddress?.phone}
+                        firstName={ctx.billingAddress?.first_name ?? ""}
+                        lastName={ctx.billingAddress?.last_name ?? ""}
+                        city={ctx.billingAddress?.city ?? ""}
+                        line1={ctx.billingAddress?.line_1 ?? ""}
+                        line2={ctx.billingAddress?.line_2 ?? ""}
+                        zipCode={ctx.billingAddress?.zip_code ?? ""}
+                        stateCode={ctx.billingAddress?.state_code ?? ""}
+                        countryCode={ctx.billingAddress?.country_code ?? ""}
+                        phone={ctx.billingAddress?.phone ?? ""}
                         addressType="billing"
                       />
                     </RecapBox>
                   </div>
-                  {ctx.isShipmentRequired && (
-                    <div data-test-id="shipping-address-recap">
-                      <RecapItemTitle>
-                        {t("stepComplete.ship_to")}
-                      </RecapItemTitle>
-                      <RecapBox>
-                        <CustomAddress
-                          firstName={ctx.shippingAddress?.first_name}
-                          lastName={ctx.shippingAddress?.last_name}
-                          city={ctx.shippingAddress?.city}
-                          line1={ctx.shippingAddress?.line_1}
-                          line2={ctx.shippingAddress?.line_2}
-                          zipCode={ctx.shippingAddress?.zip_code}
-                          stateCode={ctx.shippingAddress?.state_code}
-                          countryCode={ctx.shippingAddress?.country_code}
-                          phone={ctx.shippingAddress?.phone}
-                          addressType="shipping"
-                        />
-                      </RecapBox>
-                    </div>
-                  )}
+                  <>
+                    {ctx.isShipmentRequired && (
+                      <div data-testid="shipping-address-recap">
+                        <RecapItemTitle>
+                          {t("stepComplete.ship_to")}
+                        </RecapItemTitle>
+                        <RecapBox>
+                          <CustomAddress
+                            firstName={ctx.shippingAddress?.first_name ?? ""}
+                            lastName={ctx.shippingAddress?.last_name ?? ""}
+                            city={ctx.shippingAddress?.city ?? ""}
+                            line1={ctx.shippingAddress?.line_1 ?? ""}
+                            line2={ctx.shippingAddress?.line_2 ?? ""}
+                            zipCode={ctx.shippingAddress?.zip_code ?? ""}
+                            stateCode={ctx.shippingAddress?.state_code ?? ""}
+                            countryCode={
+                              ctx.shippingAddress?.country_code ?? ""
+                            }
+                            phone={ctx.shippingAddress?.phone ?? ""}
+                            addressType="shipping"
+                          />
+                        </RecapBox>
+                      </div>
+                    )}
+                  </>
                 </AddressContainer>
               </RecapCol>
 
-              <RecapCol data-test-id="payment-recap">
+              <RecapCol data-testid="payment-recap">
                 <RecapItemTitle>{t("stepComplete.payment")}</RecapItemTitle>
                 {ctx.isPaymentRequired ? (
                   <RecapBox>
@@ -188,7 +189,7 @@ export const StepComplete: React.FC<Props> = ({
                                   </Trans>
                                 )
                               }
-                              return getTranslations(brand, t)
+                              return <>{getTranslations(brand, t)}</>
                             }}
                           </PaymentSourceBrandName>
                         </PaymentSource>

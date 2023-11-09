@@ -20,7 +20,8 @@ const DynamicCheckout = dynamic(() => import("components/composite/Checkout"), {
 })
 
 CheckoutSkeleton.displayName = "Skeleton Loader"
-const Home: NextPage = () => {
+
+const Order: NextPage = () => {
   const { settings, retryOnError, isLoading } = useSettingsOrInvalid()
 
   if (isLoading || (!settings && !retryOnError)) return <CheckoutSkeleton />
@@ -36,15 +37,17 @@ const Home: NextPage = () => {
     <DynamicCheckoutContainer settings={settings}>
       <DynamicCheckout
         logoUrl={settings.logoUrl}
+        primaryColor={settings.primaryColor}
         orderNumber={settings.orderNumber}
         companyName={settings.companyName}
         supportEmail={settings.supportEmail}
         supportPhone={settings.supportPhone}
         termsUrl={settings.termsUrl}
         privacyUrl={settings.privacyUrl}
+        gtmId={settings.gtmId}
       />
     </DynamicCheckoutContainer>
   )
 }
 
-export default Home
+export default Order

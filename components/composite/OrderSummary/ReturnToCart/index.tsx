@@ -1,10 +1,10 @@
+// eslint-disable-next-line import/order
 import { useTranslation } from "next-i18next"
-import Link from "next/link"
 
 import { CartLinkWrapper, LinkWrapper } from "./styled"
 
 interface Props {
-  cartUrl?: string
+  cartUrl: NullableType<string>
 }
 
 export const ReturnToCart = ({ cartUrl }: Props) => {
@@ -13,12 +13,12 @@ export const ReturnToCart = ({ cartUrl }: Props) => {
   const { t } = useTranslation()
 
   return (
-    <CartLinkWrapper data-test-id="edit-cart-link">
-      <Link href={cartUrl} passHref>
+    <CartLinkWrapper data-testid="edit-cart-link">
+      <a href={cartUrl}>
         <LinkWrapper>
           <>&lt;</> {t("orderRecap.returnToCart")}
         </LinkWrapper>
-      </Link>
+      </a>
     </CartLinkWrapper>
   )
 }

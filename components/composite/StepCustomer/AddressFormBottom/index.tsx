@@ -29,7 +29,7 @@ export const AddressFormBottom: React.FC<Props> = ({
 
       {hasCustomerAddresses && (
         <LinkButton
-          data-test-id={`close-${addressType}-form`}
+          data-testid={`close-${addressType}-form`}
           label={t("stepCustomer.closeForm")}
           onClick={onClick}
         />
