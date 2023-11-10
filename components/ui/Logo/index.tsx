@@ -11,7 +11,7 @@ export const Logo: React.FC<Props> = ({ logoUrl, companyName, className }) => {
   if (logoUrl) {
     return (
       <Image
-        fetchPriority="high"
+        fetchPriority="low"
         src={logoUrl}
         alt={companyName}
         className={className}
