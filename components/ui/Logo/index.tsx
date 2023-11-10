@@ -9,7 +9,14 @@ interface Props {
 
 export const Logo: React.FC<Props> = ({ logoUrl, companyName, className }) => {
   if (logoUrl) {
-    return <Image src={logoUrl} alt={companyName} className={className} />
+    return (
+      <Image
+        fetchPriority="high"
+        src={logoUrl}
+        alt={companyName}
+        className={className}
+      />
+    )
   }
   return <Label className={className}>{companyName}</Label>
 }
