@@ -6,7 +6,8 @@ node_modules:
   image: node:18-buster-slim
   stage: node
   script:
-    - yarn install --frozen-lockfile --check-files
+    - npm i -g pnpm
+    - pnpm install
   cache:
     key: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     paths:
