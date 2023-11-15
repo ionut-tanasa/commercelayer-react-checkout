@@ -3,7 +3,7 @@ stages:
   - deploy
 
 node_modules:
-  image: node:14-buster-slim
+  image: node:18-buster-slim
   stage: node
   script:
     - yarn install --frozen-lockfile --check-files
@@ -16,7 +16,7 @@ node_modules:
       - staging
 
 staging:
-  image: node:14-buster
+  image: node:18-buster
   stage: deploy
   cache:
     key: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
