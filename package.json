@@ -6,7 +6,6 @@
   },
   "private": true,
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "dev": "cross-env PORT=5001 NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "export": "next build && next export",
