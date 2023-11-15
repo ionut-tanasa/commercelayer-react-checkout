@@ -33,12 +33,12 @@ staging:
     - apt-get install -y rsync
   script:
     - yarn build
-    - ssh -p22 forge@cyrcool.com "mkdir -p /home/forge/staging-checkout.cyrcool.com/_tmp"
-    - cd dist && rsync -rav -e ssh --exclude='.git/' --exclude='.gitlab-ci.yml' --delete-excluded ./ forge@cyrcool.com:/home/forge/staging-checkout.cyrcool.com/_tmp
-    - ssh -p22 forge@cyrcool.com "mkdir -p /home/forge/staging-checkout.cyrcool.com/dist"
-    - ssh -p22 forge@cyrcool.com "mv /home/forge/staging-checkout.cyrcool.com/dist /home/forge/staging-checkout.cyrcool.com/_old"
-    - ssh -p22 forge@cyrcool.com "mv /home/forge/staging-checkout.cyrcool.com/_tmp /home/forge/staging-checkout.cyrcool.com/dist"
-    - ssh -p22 forge@cyrcool.com "rm -rf /home/forge/staging-checkout.cyrcool.com/_old"
+    - ssh -p22 forge@52.58.36.253 "mkdir -p /home/forge/staging-checkout.cyrcool.com/_tmp"
+    - cd dist && rsync -rav -e ssh --exclude='.git/' --exclude='.gitlab-ci.yml' --delete-excluded ./ forge@52.58.36.253:/home/forge/staging-checkout.cyrcool.com/_tmp
+    - ssh -p22 forge@52.58.36.253 "mkdir -p /home/forge/staging-checkout.cyrcool.com/dist"
+    - ssh -p22 forge@52.58.36.253 "mv /home/forge/staging-checkout.cyrcool.com/dist /home/forge/staging-checkout.cyrcool.com/_old"
+    - ssh -p22 forge@52.58.36.253 "mv /home/forge/staging-checkout.cyrcool.com/_tmp /home/forge/staging-checkout.cyrcool.com/dist"
+    - ssh -p22 forge@52.58.36.253 "rm -rf /home/forge/staging-checkout.cyrcool.com/_old"
   environment:
     name: staging
     url: https://staging-checkout.cyrcool.com
