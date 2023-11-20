@@ -35,7 +35,7 @@ staging:
   script:
     - yarn build
     - ssh -p22 forge@52.58.36.253 "mkdir -p /home/forge/staging-checkout.cyrcool.com/_tmp"
-    - cd dist && rsync -rav -e ssh --exclude='.git/' --exclude='.gitlab-ci.yml' --delete-excluded ./ forge@52.58.36.253:/home/forge/staging-checkout.cyrcool.com/_tmp
+    - cd out/dist && rsync -rav -e ssh --exclude='.git/' --exclude='.gitlab-ci.yml' --delete-excluded ./ forge@52.58.36.253:/home/forge/staging-checkout.cyrcool.com/_tmp
     - ssh -p22 forge@52.58.36.253 "mkdir -p /home/forge/staging-checkout.cyrcool.com/dist"
     - ssh -p22 forge@52.58.36.253 "mv /home/forge/staging-checkout.cyrcool.com/dist /home/forge/staging-checkout.cyrcool.com/_old"
     - ssh -p22 forge@52.58.36.253 "mv /home/forge/staging-checkout.cyrcool.com/_tmp /home/forge/staging-checkout.cyrcool.com/dist"
