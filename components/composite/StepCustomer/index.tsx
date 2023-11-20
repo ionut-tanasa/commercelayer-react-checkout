@@ -97,9 +97,7 @@ export const StepCustomer: React.FC<Props> = () => {
   } = appCtx
 
   const [shipToDifferentAddress, setShipToDifferentAddress] =
-    useState(
-    !hasSameAddresses
-  )
+    useState(!hasSameAddresses)
 
   useEffect(() => {
     setShipToDifferentAddress(!hasSameAddresses)

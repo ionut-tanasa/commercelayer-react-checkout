@@ -1,7 +1,5 @@
 import { Address } from "@commercelayer/sdk"
-import {
-  ExclamationIcon,
-} from "@heroicons/react/outline"
+import { ExclamationIcon } from "@heroicons/react/outline"
 import { useContext } from "react"
 import { useTranslation } from "react-i18next"
 import styled from "styled-components"
