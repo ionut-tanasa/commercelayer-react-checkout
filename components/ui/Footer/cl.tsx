@@ -8,7 +8,14 @@ interface Props {
 }
 
 export const Logo: React.FC<Props> = ({ width, height, className }) => {
-  return <Image src="../../logo-inverted.png" width={width} height={height} />
+  return (
+    <Image
+      src="../../logo-inverted.png"
+      width={width}
+      height={height}
+      className={className}
+    />
+  )
 }
 
 const Image = styled.img`

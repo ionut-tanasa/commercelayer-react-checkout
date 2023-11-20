@@ -1,0 +1,47 @@
+stages:
+  - node
+  - deploy
+
+node_modules:
+  image: node:18-buster-slim
+  stage: node
+  script:
+    - npm i -g pnpm
+    - pnpm install
+  cache:
+    key: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+  only:
+    refs:
+      - staging
+
+staging:
+  image: node:18-buster
+  stage: deploy
+  cache:
+    key: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+    policy: pull
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - ssh-add <(echo "$PRODUCTION_PRIVATE_KEY")
+    - apt-get update
+    - apt-get install -y rsync
+  script:
+    - yarn build
+    - ssh -p22 forge@52.58.36.253 "mkdir -p /home/forge/staging-checkout.cyrcool.com/_tmp"
+    - cd dist && rsync -rav -e ssh --exclude='.git/' --exclude='.gitlab-ci.yml' --delete-excluded ./ forge@52.58.36.253:/home/forge/staging-checkout.cyrcool.com/_tmp
+    - ssh -p22 forge@52.58.36.253 "mkdir -p /home/forge/staging-checkout.cyrcool.com/dist"
+    - ssh -p22 forge@52.58.36.253 "mv /home/forge/staging-checkout.cyrcool.com/dist /home/forge/staging-checkout.cyrcool.com/_old"
+    - ssh -p22 forge@52.58.36.253 "mv /home/forge/staging-checkout.cyrcool.com/_tmp /home/forge/staging-checkout.cyrcool.com/dist"
+    - ssh -p22 forge@52.58.36.253 "rm -rf /home/forge/staging-checkout.cyrcool.com/_old"
+  environment:
+    name: staging
+    url: https://staging-checkout.cyrcool.com
+  only:
+    - staging

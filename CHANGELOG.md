@@ -1,3 +1,34 @@
+## [4.3.1](https://github.com/commercelayer/mfe-checkout/compare/v4.3.0...v4.3.1) (2023-11-16)
+
+
+### Bug Fixes
+
+* check email format and form submit validation ([cb982d6](https://github.com/commercelayer/mfe-checkout/commit/cb982d6513f21d7e1ca947c589987f0c27945ade))
+
+
+### Performance Improvements
+
+* reduce bundle size, removing states and countries from react-components ([4e614f9](https://github.com/commercelayer/mfe-checkout/commit/4e614f9fcfb221ca6799f4469b848af586d49cf1))
+
+# [4.3.0](https://github.com/commercelayer/mfe-checkout/compare/v4.2.5...v4.3.0) (2023-11-10)
+
+
+### Bug Fixes
+
+* change export to build command ([e440c4d](https://github.com/commercelayer/mfe-checkout/commit/e440c4d1c8cc263c519580dfd983f7978eb246db))
+
+
+### Features
+
+* upgrade to nextjs `v14` and remove adyen languages not supported ([edbd9c0](https://github.com/commercelayer/mfe-checkout/commit/edbd9c0d00d80190342e6e85748e80a7d55b8b6f))
+
+## [4.2.5](https://github.com/commercelayer/mfe-checkout/compare/v4.2.4...v4.2.5) (2023-11-09)
+
+
+### Bug Fixes
+
+* skip `begin_checkout` event when completing payment or reload page on `placed` orders ([5b4c3c4](https://github.com/commercelayer/mfe-checkout/commit/5b4c3c4d93f59f7f875711f4d71f9a09b986fb53))
+
 ## [4.2.4](https://github.com/commercelayer/mfe-checkout/compare/v4.2.3...v4.2.4) (2023-11-07)
 
 

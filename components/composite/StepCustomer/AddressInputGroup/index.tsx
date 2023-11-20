@@ -2,7 +2,6 @@ import AddressCountrySelector from "@commercelayer/react-components/addresses/Ad
 import AddressInput from "@commercelayer/react-components/addresses/AddressInput"
 import AddressStateSelector from "@commercelayer/react-components/addresses/AddressStateSelector"
 import { Errors } from "@commercelayer/react-components/errors/Errors"
-import { InformationCircleIcon } from "@heroicons/react/outline"
 import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import styled from "styled-components"
@@ -149,27 +148,6 @@ export const AddressInputGroup: React.FC<Props> = ({
             value={value}
           />
           <Label htmlFor={fieldName}>{label}</Label>
-        </>
-      )
-    } else if (isBillingInfo) {
-      return (
-        <>
-          <StyledAddressInput
-            id={fieldName}
-            required={required}
-            data-test-id={`input_${fieldName}`}
-            name={fieldName as AddressInputName}
-            type={type}
-            value={valueStatus}
-            className="form-input"
-          />
-          <Label htmlFor={fieldName}>{label}</Label>
-          <div className="flex items-center pb-2 mt-1 text-xs">
-            <InformationCircleIcon className="w-4 h-4 mr-2 text-primary" />
-            <span className="text-xs text-gray-500">
-              {t(`addressForm.billing_address_billing_info_info`)}
-            </span>
-          </div>
         </>
       )
     } else {
