@@ -13,7 +13,6 @@ import { Trans, useTranslation } from "react-i18next"
 import { AppProviderData } from "components/data/AppProvider"
 import { LINE_ITEMS_SHOPPABLE } from "components/utils/constants"
 
-import { CouponOrGiftCard } from "./CouponOrGiftCard"
 import { LineItemTypes } from "./LineItemTypes"
 import { ReturnToCart } from "./ReturnToCart"
 import {

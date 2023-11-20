@@ -1,6 +1,5 @@
 import { Address } from "@commercelayer/sdk"
 import {
-  InformationCircleIcon,
   ExclamationIcon,
 } from "@heroicons/react/outline"
 import { useContext } from "react"
