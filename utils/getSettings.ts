@@ -143,7 +143,7 @@ export const getSettings = async ({
   orderId: string
   paymentReturn?: boolean
   subdomain: string
-  slug: string
+  slug: string | null
 }) => {
   const domain = process.env.NEXT_PUBLIC_DOMAIN || "commercelayer.io"
 

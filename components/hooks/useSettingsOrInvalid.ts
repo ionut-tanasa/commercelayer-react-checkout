@@ -49,8 +49,8 @@ export const useSettingsOrInvalid = (): UseSettingsOrInvalid => {
         accessToken: savedAccessToken,
         orderId: orderId as string,
         paymentReturn: isPaymentReturn,
-        subdomain: getSubdomain(window.location.hostname, slug),
-        slug: slug
+        subdomain: getSubdomain(window.location.hostname, slug as string),
+        slug: slug as string,
       }).then((fetchedSettings) => {
         setSettings(fetchedSettings)
         setIsFetching(false)
