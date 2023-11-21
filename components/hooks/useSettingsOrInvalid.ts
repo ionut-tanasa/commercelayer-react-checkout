@@ -19,6 +19,7 @@ export const useSettingsOrInvalid = (): UseSettingsOrInvalid => {
   const paymentReturn = searchParams.get("paymentReturn")
   const redirectResult = searchParams.get("redirectResult")
   const redirectStatus = searchParams.get("redirect_status")
+  const slug = searchParams.get("slug")
   const [settings, setSettings] = useState<
     CheckoutSettings | InvalidCheckoutSettings | undefined
   >(undefined)
@@ -48,7 +49,8 @@ export const useSettingsOrInvalid = (): UseSettingsOrInvalid => {
         accessToken: savedAccessToken,
         orderId: orderId as string,
         paymentReturn: isPaymentReturn,
-        subdomain: getSubdomain(window.location.hostname),
+        subdomain: getSubdomain(window.location.hostname, slug),
+        slug: slug
       }).then((fetchedSettings) => {
         setSettings(fetchedSettings)
         setIsFetching(false)
